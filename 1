@@ -1,0 +1,43 @@
+function summarizeEmailWithGitHub(emailBody) {
+  var token = "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"; // Reemplaza con tu token personal de GitHub
+  var apiUrl = "https://models.inference.ai.azure.com"; // Cambia TU_REPOSITORIO por el repo correcto
+  
+  // Payload para la solicitud
+  var payload = {
+    "model": "gpt-4",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Eres un asistente que resume correos electrónicos."
+      },
+      {
+        "role": "user",
+        "content": "Resume este correo en 3 frases:\n" + emailBody
+      }
+    ],
+    "max_tokens": 150,
+    "temperature": 0.5
+  };
+  
+  var options = {
+    "method": "post",
+    "contentType": "application/json",
+    "headers": {
+      "Authorization": "Bearer " + token,
+      "Accept": "application/vnd.github+json"
+    },
+    "payload": JSON.stringify(payload)
+  };
+  
+  try {
+    // Realiza la solicitud a la API de GitHub
+    var response = UrlFetchApp.fetch(apiUrl, options);
+    var result = JSON.parse(response.getContentText());
+    
+    // Devuelve el contenido generado por GPT-4
+    return result.choices[0].message.content.trim();
+  } catch (e) {
+    Logger.log("Error al conectarse a la API de GitHub: " + e.message);
+    return "No se pudo generar un resumen.";
+  }
+}
